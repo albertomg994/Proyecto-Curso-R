@@ -10,7 +10,8 @@ shinyUI(
     tabPanel("Mapa",
       sidebarLayout(
         sidebarPanel(
-          radioButtons("plotType", "Plot type", c("Scatter"="p", "Line"="l"))
+          #radioButtons("plotType", "Plot type", c("Scatter"="p", "Line"="l"))
+          radioButtons("rb_gratis", "rb_gratis", c("Pago" = "pay", "Gratuitos" = "free", "Todos" = "all", "Ninguno" = "none"))
         ),
         
         mainPanel(
