@@ -1,6 +1,7 @@
+# Alberto Miedes Garcés - 23 - 07 - 2015
+
 library(shiny)
 library(leaflet)
-library(XML)
 library(sp)
 library(rgdal)
 library(readr)
@@ -106,7 +107,6 @@ shinyServer(function(input, output) {
   # ==========================================================================================
   # Renderizar la tabla a través del data.frame
   output$tabla <- DT::renderDataTable(DT::datatable({
-    data <- datos
     data <- subset(datos, select = c(NOMBRE, GRATUITO, FECHA, HORA, NOMBRE.INSTALACION, DISTRITO))
     
     if (input$distrito != "All") {

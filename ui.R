@@ -1,3 +1,5 @@
+# Alberto Miedes Garcés - 23 - 07 - 2015
+
 library(shiny)
 library(leaflet)
 library(sp)
@@ -34,7 +36,6 @@ shinyUI(
         ),
         
         mainPanel(
-          #h2("Mapa con las ubicaciones"),
           leafletOutput("myMap")
         )
       )
