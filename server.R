@@ -7,10 +7,8 @@ library(readr)
 
 shinyServer(function(input, output) {
   
-  
   # Lectura de los datos
   datos <- read.csv(file="data/datos1.csv", header=TRUE, sep=";")
-  
   
   # GRÁFICAS SOBRE LOS DATOS
   # ==========================================================================================
@@ -19,25 +17,25 @@ shinyServer(function(input, output) {
   rsm_distritos <- summary(distritos)
   output$plotDistritos <- renderPlot({
     barplot(rsm_distritos, 
-        main="Distribución por distritos",
+        main="Actividades por distritos",
         ylab="Nº actividades",
         xlab="Distrito")
   })
   
   # Gratuidad o no
-  gratuidad <- datos$GRATUITO # Esto va regular
-  rsm_gratuidad <- summary(gratuidad)
+  #gratuidad <- datos$GRATUITO # Esto va regular
+  #rsm_gratuidad <- summary(gratuidad)
   
   # Fechas
-  fechas <- datos$FECHA
-  rsm_fechas <- summary(fechas)
+  #fechas <- datos$FECHA
+  #rsm_fechas <- summary(fechas)
   
   # Horas
   horas <- datos$HORA
   rsm_horas <- summary(horas)
   output$plotHoras <- renderPlot({
     barplot(rsm_horas, 
-            main="Distribución por horas",
+            main="Actividades por horas",
             ylab="Nº actividades",
             xlab="Hora")
   })
@@ -47,72 +45,62 @@ shinyServer(function(input, output) {
   # Construir el mapa
   map <- leaflet()
   map <- addTiles(map)
-  #map %>% setView(40.89710, -3.63655, 1)
   
-  # Poblar el mapa
+  # Poblar el mapa (DESHABILITADO DE MOMENTO)
+#   for (i in 1:nrow(datos)) {
+#     if(datos$GRATUITO[i] == TRUE) {
+#       map <- addMarkers(map, lng=datos$longitude[i], lat=datos$latitude[i], popup=datos$NOMBRE[i], group = "free_markers")
+#     } else {
+#       map <- addMarkers(map, lng=datos$longitude[i], lat=datos$latitude[i], popup=datos$NOMBRE[i], group = "pay_markers")
+#     }
+#   }
+  
+  # Poblamos el mapa con los marcadores, a la vez que asignamos el grupo
+  distritos <- c("ARGANZUELA", "CARABANCHEL", "CENTRO", "CHAMARTIN", "CHAMBERI", "CIUDAD LINEAL", "FUENCARRAL-EL PARDO", "LATINA", "MONCLOA-ARAVACA", "MORATALAZ", "PUENTE DE VALLECAS", "RETIRO", "SALAMANCA", "SAN BLAS-CANILLEJAS" ,"TETUAN" ,"USERA", "VILLAVERDE")
+  distritos_abr <- c("arg", "car", "cen", "cha", "chb", "ciu", "fue", "lat", "mon", "mor", "pue", "ret", "sal", "san", "tet", "use", "vill")
   for (i in 1:nrow(datos)) {
-    if(datos$GRATUITO[i] == TRUE) {
-      map <- addMarkers(map, lng=datos$longitude[i], lat=datos$latitude[i], popup=datos$NOMBRE[i], group = "free_markers")
-    } else {
-      map <- addMarkers(map, lng=datos$longitude[i], lat=datos$latitude[i], popup=datos$NOMBRE[i], group = "pay_markers")
-    }
+    group_name <- datos$DISTRITO[i]
+    map <- addMarkers(map, lng=datos$longitude[i], lat=datos$latitude[i], popup=datos$NOMBRE[i], group = group_name)
   }
   
-  # RenderizaR el mapa
-  #output$myMap <- renderLeaflet({
-    #map <- addMarkers(map, lng=input$longitud, lat=input$latitud, popup="The birthplace of R")
-  #  map
-  #})
-  ############################
+  # Renderizado del mapa (se ejecutará cada vez que hay un cambio en la GUI)
   output$myMap <- renderLeaflet({
     
-    # Cargar los marcadores en función de las opciones
-    if(input$rb_gratis == "free") {
-      print("Estas en free")
-      map <- showGroup(map, "free_markers")
-      map <- hideGroup(map, "pay_markers")
-    } 
-    else if(input$rb_gratis == "pay") {
-      print("Estas en pay")
-      map <- showGroup(map, "pay_markers")
-      map <- hideGroup(map, "free_markers")
-    } 
-    else if(input$rb_gratis == "none") {
-      print("Estas en none")
-      map <- hideGroup(map, "pay_markers")
-      map <- hideGroup(map, "free_markers")
-    } 
-    else { #all
-      print("Estas en all")
-      map <- showGroup(map, "pay_markers")
-      map <- showGroup(map, "free_markers")
+    # Cargar los marcadores en función de las opciones de precio (DESHABILITADO DE MOMENTO)
+#     if(input$rb_gratis == "free") {
+#       map <- showGroup(map, "free_markers")
+#       map <- hideGroup(map, "pay_markers")
+#     } else if(input$rb_gratis == "pay") {
+#       map <- showGroup(map, "pay_markers")
+#       map <- hideGroup(map, "free_markers")
+#     } else if(input$rb_gratis == "none") {
+#       map <- hideGroup(map, "pay_markers")
+#       map <- hideGroup(map, "free_markers")
+#     } else { #all
+#       map <- showGroup(map, "pay_markers")
+#       map <- showGroup(map, "free_markers")
+#     }
+
+    # Cargar los marcadores en función de las opciones de distrito
+    dist_sel <- input$rb_distrito
+    if (dist_sel == "all") {
+      for (i in 1:length(distritos)) {
+        map <- showGroup(map, distritos[i])
+      }
+    } else {
+      for (i in 1:length(distritos)) {
+        # Si es el distrito seleccionado lo mostramos
+        if(distritos_abr[i] == dist_sel) {
+          map <- showGroup(map, distritos[i])
+        } else { # e.o.c. lo ocultamos
+          map <- hideGroup(map, distritos[i])
+        }
+      }
     }
 
-    #print("Markers ahora vale:")
-    #print(head(markers))
-    #print("....")
-    #print(tail(markers))
-    
-    # Borramos los marcadores antiguos
-    #map <- removeMarker(map, 1)
-
-    # Renderizar
-    #for (i in 1:nrow(markers)) {
-    #  map <- addMarkers(map, lng=markers$longitude[i], lat=markers$latitude[i], popup=markers$NOMBRE[i], layerId = 1)
-    #}
+    # Mostrar el mapa
     map
   })
-  ############################
-  
-  # Más operaciones sobre el mapa
-  mostrarHoy <- function () {
-    date <- "2015-01-03"
-    datos.hoy <- subset(datos, subset = (datos$FECHA == date))
-  }
-  mostrarGratis <- function () {
-    datos.gratis <- subset(datos, subset = (datos$GRATUITO == 1))
-  }
-  
   
   # TABLA DE DATOS
   # ==========================================================================================

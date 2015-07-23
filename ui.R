@@ -5,17 +5,36 @@ library(rgdal)
 library(readr)
 
 shinyUI(
-  navbarPage("Nobre de la barra",
+  navbarPage("¡Madrid!",
     # Tab 1
     tabPanel("Mapa",
       sidebarLayout(
         sidebarPanel(
-          #radioButtons("plotType", "Plot type", c("Scatter"="p", "Line"="l"))
-          radioButtons("rb_gratis", "rb_gratis", c("Pago" = "pay", "Gratuitos" = "free", "Todos" = "all", "Ninguno" = "none"))
+          # radioButtons("rb_gratis", "rb_gratis", c("Pago" = "pay", "Gratuitos" = "free", "Todos" = "all", "Ninguno" = "none")),
+          radioButtons("rb_distrito", "Filtrar por distrito:", c(
+            "Todos" = "all",
+            "Arganzuela" = "arg",
+            "Carabancher" = "car",
+            "Centro" = "cen",
+            "Chamartin" = "cha",
+            "Chamberi" = "chb",
+            "Ciudad Lineal" = "ciu",
+            "Fuencarral - El Pardo" = "fue",
+            "Latina" = "lat",
+            "Moncloa - Aravaca" = "mon",
+            "Moratalaz" = "mor", 
+            "Puente de Vallecas" = "pue", 
+            "Retiro" = "ret", 
+            "Salamanca" = "sal", 
+            "San Blas - Canillejas" ="san",
+            "Tetuan" = "tet",
+            "Usera" = "use", 
+            "Villaverde" = "vill")
+          )
         ),
         
         mainPanel(
-          h2("Mapa con las ubicaciones"),
+          #h2("Mapa con las ubicaciones"),
           leafletOutput("myMap")
         )
       )
